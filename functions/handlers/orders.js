@@ -24,7 +24,7 @@ exports.getFutureOrders = (req, res) => {
         // .orderBy('locationDate', 'desc') // get up
         .where('userID', '==', req.user.uid)
         .where('locationDate', '>=', SwissDate.now().string)
-        .orderBy('locationDate', 'desc')
+        .orderBy('locationDate', 'asc')
         .get()
         .then((data) => {
             return res.json(exports.dataToOrders(data))
