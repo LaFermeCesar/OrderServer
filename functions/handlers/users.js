@@ -1,6 +1,7 @@
 const {db} = require('../util/admin');
 const firebase = require('firebase');
 const firebaseConfig = require('../util/firebase_config');
+const {adminID} = require("../util/firebase_auth");
 const {dbGetBreads} = require("./breads");
 const {dbGetLocations} = require("./locations");
 const {staticValidateUser} = require('../util/validaters');
@@ -59,7 +60,8 @@ exports.signup = (req, res) => {
                         return dbGetBreads();
                     })
                     .then((breads) => {
-                        return res.json({token, locations, breads});
+                        const user = {isAdmin: userID === adminID}
+                        return res.json({token, locations, breads, user});
                     })
                     .catch((err) => {
                         console.error(err);
@@ -83,12 +85,15 @@ exports.login = (req, res) => {
     }
 
     const cred = userToCred(user);
-    let token, locations;
+    let token, userID, locations;
 
     return firebase
         .auth()
         .signInWithEmailAndPassword(cred.email, cred.password)
-        .then((data) => data.user.getIdToken())
+        .then((data) => {
+            userID = data.user.uid;
+            return data.user.getIdToken();
+        })
         .then((token_) => {
             token = token_;
             return dbGetLocations();
@@ -98,7 +103,8 @@ exports.login = (req, res) => {
             return dbGetBreads();
         })
         .then((breads) => {
-            return res.json({token, locations, breads});
+            const user = {isAdmin: userID === adminID}
+            return res.json({token, locations, breads, user});
         })
         .catch((err) => {
             console.error(err);

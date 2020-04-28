@@ -17,7 +17,7 @@ exports.dbGetLocations = () => {
 };
 
 exports.getLocations = (req, res) => {
-    return dbGetLocations()
+    return exports.dbGetLocations()
         .then((locations) => res.json(locations))
         .catch((err) => {
             console.error(err);

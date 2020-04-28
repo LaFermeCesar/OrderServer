@@ -17,7 +17,7 @@ exports.dbGetBreads = () => {
 };
 
 exports.getBreads = (req, res) => {
-    return dbGetBreads()
+    return exports.dbGetBreads()
         .then((breads) => res.json(breads))
         .catch((err) => {
             console.error(err);

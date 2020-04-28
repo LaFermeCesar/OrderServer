@@ -6,6 +6,7 @@ const app = require('express')();
 
 const {getFutureOrders, getPastOrders, postOrder, getAllOrders, deleteOrder} = require("./handlers/orders");
 const {login, signup} = require('./handlers/users');
+const {getOrdersSheet, getQuantitySheet} = require("./handlers/sheets");
 
 const cors = require('cors');
 app.use(cors());
@@ -27,6 +28,11 @@ app.get('/locations', getLocations);
 // ROUTE USERS
 app.post('/signup', signup);
 app.post('/login', login);
+
+
+// ROUTE SHEETS
+app.get('/orders_sheet', AdminAuth, getOrdersSheet);
+app.get('/quantity_sheet', AdminAuth, getQuantitySheet);
 
 
 exports.api = functions.region('europe-west1').https.onRequest(app);

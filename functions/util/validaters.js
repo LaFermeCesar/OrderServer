@@ -1,3 +1,5 @@
+const {SwissDate} = require("./swiss_date");
+
 const PhoneNumber = require('libphonenumber-js');
 const {dbGetBreads} = require("../handlers/breads");
 const {dbGetLocations} = require("../handlers/locations");
@@ -118,7 +120,7 @@ exports.staticValidateOrder = (userID, locationID, locationDate, breadList) => {
         return {errors}
     }
 
-    const dateNowString = new Date().toISOString();
+    const dateTimeNowString = new Date().toISOString();
 
     return {
         order: {
@@ -129,8 +131,8 @@ exports.staticValidateOrder = (userID, locationID, locationDate, breadList) => {
                 breadID: breadOrder.breadID,
                 quantity: parseFloat(breadOrder.quantity)
             })),
-            createdAt: dateNowString,
-            lastModified: dateNowString,
+            createdAt: dateTimeNowString,
+            lastModified: dateTimeNowString,
         }
     };
 };
@@ -145,7 +147,9 @@ exports.promiseValidateOrder = (order) => {
                 console.log('invalid locationID, someone might be sending request manually.');
                 errors.locationID = 'is invalid';
             } else {
-                if (!loc.daysOfWeek.includes(new Date(order.locationDate).getDay() + 1)) { // + 1 is a quick fix because the day returned by server is UTC
+                const locDate = new SwissDate(order.locationDate)
+                if (!loc.daysOfWeek.includes(locDate.day)
+                    || locDate.dayDifference(SwissDate.now()) > 0) {
                     errors.locationDate = 'is invalid';
                 }
             }

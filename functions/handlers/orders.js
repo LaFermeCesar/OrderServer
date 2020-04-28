@@ -1,3 +1,5 @@
+const {SwissDate} = require("../util/swiss_date");
+
 const {dbGetUsers} = require("./users");
 const {dbGetLocations} = require("./locations");
 const {dbGetBreads} = require("./breads");
@@ -5,13 +7,7 @@ const {promiseValidateOrder} = require("../util/validaters");
 const {staticValidateOrder} = require("../util/validaters");
 const {db} = require('../util/admin');
 
-const todayAtMidnight = () => {
-    const date = new Date();
-    date.setHours(0, 0, 0, 0);
-    return date
-};
-
-const dataToOrders = (data) => {
+exports.dataToOrders = (data) => {
     const orders = [];
     data.forEach((doc) => {
         const order = {
@@ -27,10 +23,11 @@ exports.getFutureOrders = (req, res) => {
     return db.collection('orders')
         // .orderBy('locationDate', 'desc') // get up
         .where('userID', '==', req.user.uid)
-        .where('locationDate', '>=', todayAtMidnight().toISOString())
+        .where('locationDate', '>=', SwissDate.now().string)
+        .orderBy('locationDate', 'desc')
         .get()
         .then((data) => {
-            return res.json(dataToOrders(data))
+            return res.json(exports.dataToOrders(data))
         })
         .catch((err) => {
             console.error(err);
@@ -43,12 +40,12 @@ exports.getPastOrders = (req, res) => {
     return db.collection('orders')
         // .orderBy('locationDate', 'desc') // get up
         .where('userID', '==', req.user.uid)
-        .where('locationDate', '<', todayAtMidnight().toISOString())
+        .where('locationDate', '<', SwissDate.now().string)
         .orderBy('locationDate', 'desc')
         // .limit(1)
         .get()
         .then((data) => {
-            return res.json(dataToOrders(data));
+            return res.json(exports.dataToOrders(data));
         })
         .catch((err) => {
             console.error(err);
@@ -118,7 +115,7 @@ exports.getAllOrders = (req, res) => {
     return db.collection('orders')
         .get()
         .then((data) => {
-            orders = dataToOrders(data);
+            orders = exports.dataToOrders(data);
             return dbGetUsers();
         })
         .then(users => {
@@ -153,7 +150,8 @@ exports.getAllOrders = (req, res) => {
                 breadList: order.breadList.map(breadOrder => ({
                     breadName: breadOrder.bread.name,
                     quantity: breadOrder.quantity,
-                }))
+                })),
+                lastModified: order.lastModified,
             })));
         })
         .catch((err) => {
@@ -174,9 +172,13 @@ exports.deleteOrder = (req, res) => {
             if (data.exists && data.data().userID === req.user.uid) {
                 return db.doc(`/orders/${orderID}`)
                     .delete()
-                    .then(() => res.json({message: `document ${orderID} deleted successfully`}))
+                    .then(() => {
+                        console.log(`user ${req.user.uid} deleted a document at ${new Date().toISOString()}`)
+                        return res.json({message: `document ${orderID} deleted successfully`})
+                    })
             } else {
-                return res.status(400).json({general: 'cannot modify someone else\'s order'});
+                console.log(`suspicious attempt of deletion by user ${req.user.uid}`)
+                return res.status(400).json({general: 'cannot delete someone else\'s order'});
             }
         })
         .catch((err) => {
