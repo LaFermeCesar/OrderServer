@@ -107,12 +107,8 @@ exports.login = (req, res) => {
             return res.json({token, locations, breads, user});
         })
         .catch((err) => {
-            console.error(err);
-            // if (err.code === 'auth/wrong-password') {
-            return res.status(403).json({general: 'wrong credentials, please try again.'})
-            // } else {
-            //     return res.status(500).json({error: err.code});
-            // }
+            console.log(err)
+            return res.status(403).json({general: 'Ce numéro est déjà associé à une autre paire de prénom/nom'})
         })
 
 };

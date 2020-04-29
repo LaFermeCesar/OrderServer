@@ -5,6 +5,7 @@ const {dataToOrders} = require("./orders");
 const {dbGetUsers} = require("./users");
 const {dbGetLocations} = require("./locations");
 const {dbGetBreads} = require("./breads");
+const dayjs = require('dayjs')
 
 const pad = (num, size) => {
     let s = String(num);
@@ -69,9 +70,9 @@ exports.dbGetOrders = () => {
 };
 
 const makeBook = () => XLSX.utils.book_new();
-const addSheet = (book, data, name) => {
-    data.unshift([]);
-    data.unshift([name]);
+const addSheet = (book, data, name, date) => {
+    const dateString = dayjs(date.string).format('DD/MM/YYYY')
+    data.unshift([name, dateString]);
     XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(data), name);
 }
 const bookToBuffer = (book) => XLSX.write(book, {type: 'buffer', bookType: 'xlsx'});
@@ -80,7 +81,7 @@ const nextMarketDate = () => SwissDate.next([3, 6]);
 
 
 exports.getQuantitySheet = (req, res) => {
-    let marketDate = req.query.date ? new SwissDate(req.query.date) : nextMarketDate();
+    const marketDate = req.query.date ? new SwissDate(req.query.date) : nextMarketDate();
 
     return exports.dbGetOrders()
         .then(out => {
@@ -120,14 +121,14 @@ exports.getQuantitySheet = (req, res) => {
                     .sort()
                     .map(name => [name, quantities[name]])
 
-                addSheet(book, data, sheetName)
+                addSheet(book, data, sheetName, marketDate)
             });
 
             const totData = Object.keys(totalQuantities)
                 .sort()
                 .map(name => [name, totalQuantities[name]])
 
-            addSheet(book, totData, 'Tous')
+            addSheet(book, totData, 'Tous', marketDate)
 
             return res.status(200).send(bookToBuffer(book));
         })
@@ -138,7 +139,7 @@ exports.getQuantitySheet = (req, res) => {
 }
 
 exports.getOrdersSheet = (req, res) => {
-    let marketDate = req.query.date ? new SwissDate(req.query.date) : nextMarketDate();
+    const marketDate = req.query.date ? new SwissDate(req.query.date) : nextMarketDate();
 
     return exports.dbGetOrders()
         .then(out => {
@@ -171,7 +172,7 @@ exports.getOrdersSheet = (req, res) => {
                         }
                         return -1;
                     });
-                addSheet(book, data, sheetName);
+                addSheet(book, data, sheetName, marketDate);
             })
 
             return res.status(200).send(bookToBuffer(book));
