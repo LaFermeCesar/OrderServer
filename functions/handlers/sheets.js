@@ -1,19 +1,11 @@
 const {db} = require('../util/admin');
 const XLSX = require('xlsx');
+const dayjs = require('dayjs')
 const {SwissDate} = require("../util/swiss_date");
 const {dataToOrders} = require("./orders");
 const {dbGetUsers} = require("./users");
 const {dbGetLocations} = require("./locations");
 const {dbGetBreads} = require("./breads");
-const dayjs = require('dayjs')
-
-const pad = (num, size) => {
-    let s = String(num);
-    while (s.length < (size || 2)) {
-        s = "0" + s;
-    }
-    return s;
-}
 
 exports.dbGetOrders = () => {
     let orders, locations, breads;
@@ -156,14 +148,12 @@ exports.getOrdersSheet = (req, res) => {
                     })
                     .map(order => {
                         const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber})`;
-                        const location = `${order.location.name}`;
                         const breads = order.breadList
                             .map(breadOrder => `${breadOrder.quantity} ${breadOrder.name}`)
                             .join(', ');
                         const dateTime = new Date(order.lastModified)
                         dateTime.setTime(dateTime.getTime() + 2 * 1000 * 60 * 60)
-                        const dateTimeString =
-                            `${pad(dateTime.getUTCDate(), 2)}.${pad(dateTime.getUTCMonth() + 1, 2)} ${pad(dateTime.getUTCHours(), 2)}:${pad(dateTime.getUTCMinutes(), 2)} `
+                        const dateTimeString = dayjs(dateTime).format('DD/MM HH:MM');
                         return [name, dateTimeString, breads]
                     })
                     .sort((a, b) => {
