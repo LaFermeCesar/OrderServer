@@ -1,3 +1,6 @@
+import {toID} from "../util/id_number";
+import {firestore} from "firebase";
+
 const {SwissDate} = require("../util/swiss_date");
 
 const {dbGetUsers} = require("./users");
@@ -6,6 +9,7 @@ const {dbGetBreads} = require("./breads");
 const {promiseValidateOrder} = require("../util/validaters");
 const {staticValidateOrder} = require("../util/validaters");
 const {db} = require('../util/admin');
+const {isAdmin} = require('../util/firebase_auth')
 
 exports.dataToOrders = (data) => {
     const orders = [];
@@ -18,6 +22,31 @@ exports.dataToOrders = (data) => {
     });
     return orders
 };
+
+exports.getOrderFromNumber = (req, res) => {
+    if (req.body.orderNumber !== undefined) {
+        return res.status(400).json({error: {orderNumber: 'is missing'}})
+    }
+    const orderIDStart = toID(req.body.orderNumber)
+
+    return db.collection('orders')
+        // .orderBy('locationDate', 'desc') // get up
+        .where(firestore.FieldPath.documentId(), '>=', orderIDStart)
+        .where(firestore.FieldPath.documentId(), '<', orderIDStart + '~')
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get()
+        .then((data) => {
+            if (data.length === 0) {
+                return res.json({});
+            }
+            return res.json(exports.dataToOrders(data));
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json({error: 'something went wrong'});
+        });
+}
 
 exports.getFutureOrders = (req, res) => {
     return db.collection('orders')
@@ -59,7 +88,7 @@ const addOrder = (order, res) => {
         .then((doc) => res.json({message: `document ${doc.id} created successfully`}))
         .catch((err) => {
             console.error(err);
-            return res.status(500).json({error: 'something went wrong'});
+            return res.status(500).json({general: 'something went wrong, please try again'});
         });
 };
 
@@ -73,7 +102,7 @@ const updateOrder = (orderID, order, res) => {
                     .update(order)
                     .then(() => res.json({message: `document ${orderID} updated successfully`}))
             } else {
-                return res.status(400).json({general: 'cannot modify someone else\'s order'});
+                return res.status(400).json({general: "cannot modify someone else's order"});
             }
         })
         .catch((err) => {
@@ -83,8 +112,16 @@ const updateOrder = (orderID, order, res) => {
 };
 
 exports.postOrder = (req, res) => {
+    if (!req.body.userID) {
+        req.body.userID = req.user.uid
+    }
+
+    if (!isAdmin(req) && req.body.userID !== req.user.uid) {
+        return res.status(400).json({general: 'cannot pretend to be someone else'});
+    }
+
     const {errors, order} = staticValidateOrder(
-        req.user.uid,
+        req.body.userID,
         req.body.locationID,
         req.body.locationDate,
         req.body.breadList,
@@ -106,7 +143,6 @@ exports.postOrder = (req, res) => {
                 }
             }
         })
-
 };
 
 

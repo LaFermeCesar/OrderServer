@@ -1,11 +1,11 @@
 const functions = require('firebase-functions');
-const {getLocations} = require("./handlers/locations");
-const {getBreads} = require("./handlers/breads");
-const {FBAuth, AdminAuth} = require("./util/firebase_auth");
 const app = require('express')();
 
-const {getFutureOrders, getPastOrders, postOrder, getAllOrders, deleteOrder} = require("./handlers/orders");
+const {FBAuth, AdminAuth} = require("./util/firebase_auth");
 const {login, signup} = require('./handlers/users');
+const {getFutureOrders, getPastOrders, postOrder, getAllOrders, deleteOrder, getOrderFromNumber} = require("./handlers/orders");
+const {getLocations} = require("./handlers/locations");
+const {getBreads} = require("./handlers/breads");
 const {getOrdersSheet, getQuantitySheet} = require("./handlers/sheets");
 
 const cors = require('cors');
@@ -15,9 +15,10 @@ app.use(cors());
 app.get('/future_orders', FBAuth, getFutureOrders);
 app.get('/past_orders', FBAuth, getPastOrders);
 app.get('/list_orders', AdminAuth, getAllOrders);
+
+app.post('order_number', AdminAuth, getOrderFromNumber)
 app.post('/order', FBAuth, postOrder);
 app.post('/delete_order', FBAuth, deleteOrder);
-// app.post('/update_order', )
 
 //ROUTE BREADS
 app.get('/breads', getBreads);
