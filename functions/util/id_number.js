@@ -1,4 +1,4 @@
-import {pad} from "./utils";
+const {pad} = require("./utils");
 
 const ID_SIZE = 4
 const NUMBER_SIZE = 8

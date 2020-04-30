@@ -99,10 +99,8 @@ exports.getQuantitySheet = (req, res) => {
                                 const key = `${name} (${quantity * 1000}g)`
                                 quantities[key] = quantities[key] ? quantities[key] + 1 : 1
                                 totalQuantities[key] = totalQuantities[key] ? totalQuantities[key] + 1 : 1
-
                                 name = `${name} (total)`
                             }
-
                             quantities[name] = quantities[name] ? quantities[name] + quantity : quantity
                             totalQuantities[name] = totalQuantities[name] ? totalQuantities[name] + quantity : quantity
                         })

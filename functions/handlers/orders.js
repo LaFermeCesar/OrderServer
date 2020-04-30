@@ -1,5 +1,5 @@
-import {toID} from "../util/id_number";
-import {firestore} from "firebase";
+const {toID} = require("../util/id_number");
+const {firestore} = require("firebase");
 
 const {SwissDate} = require("../util/swiss_date");
 
