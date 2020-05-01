@@ -1,14 +1,14 @@
-const {toID} = require("../util/id_number");
-const {firestore} = require("firebase");
+const {admin} = require('../util/admin');
+const {db} = require('../util/admin');
 
 const {SwissDate} = require("../util/swiss_date");
+const {toID} = require("../util/id_number");
 
 const {dbGetUsers} = require("./users");
 const {dbGetLocations} = require("./locations");
 const {dbGetBreads} = require("./breads");
 const {promiseValidateOrder} = require("../util/validaters");
 const {staticValidateOrder} = require("../util/validaters");
-const {db} = require('../util/admin');
 const {isAdmin} = require('../util/firebase_auth')
 
 exports.dataToOrders = (data) => {
@@ -24,23 +24,23 @@ exports.dataToOrders = (data) => {
 };
 
 exports.getOrderFromNumber = (req, res) => {
-    if (req.body.orderNumber !== undefined) {
+    if (req.body.orderNumber === undefined || req.body.orderNumber === '') {
         return res.status(400).json({error: {orderNumber: 'is missing'}})
     }
     const orderIDStart = toID(req.body.orderNumber)
+    console.log(orderIDStart)
 
     return db.collection('orders')
-        // .orderBy('locationDate', 'desc') // get up
-        .where(firestore.FieldPath.documentId(), '>=', orderIDStart)
-        .where(firestore.FieldPath.documentId(), '<', orderIDStart + '~')
-        .orderBy('createdAt', 'desc')
-        .limit(1)
+        .where(admin.firestore.FieldPath.documentId(), '>=', orderIDStart)
+        .where(admin.firestore.FieldPath.documentId(), '<', orderIDStart + '~')
         .get()
         .then((data) => {
-            if (data.length === 0) {
-                return res.json({});
+            const orders = exports.dataToOrders(data).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+            if (orders.length > 0) {
+                return res.json(orders[0]);
+            } else {
+                return res.json({})
             }
-            return res.json(exports.dataToOrders(data));
         })
         .catch((err) => {
             console.error(err);

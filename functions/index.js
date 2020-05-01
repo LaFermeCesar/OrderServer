@@ -16,7 +16,7 @@ app.get('/future_orders', FBAuth, getFutureOrders);
 app.get('/past_orders', FBAuth, getPastOrders);
 app.get('/list_orders', AdminAuth, getAllOrders);
 
-app.post('order_number', AdminAuth, getOrderFromNumber)
+app.post('/order_number', AdminAuth, getOrderFromNumber)
 app.post('/order', FBAuth, postOrder);
 app.post('/delete_order', FBAuth, deleteOrder);
 
