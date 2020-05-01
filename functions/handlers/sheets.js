@@ -64,7 +64,7 @@ exports.dbGetOrders = () => {
 
 const makeBook = () => XLSX.utils.book_new();
 const addSheet = (book, data, name, date) => {
-    const dateString = dayjs(date.string).format('DD/MM/YYYY')
+    const dateString = dayjs(date.string).format('DD/MM/YYYY HH:MM')
     data.unshift([name, dateString]);
     XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(data), name);
 }
