@@ -28,7 +28,6 @@ exports.getOrderFromNumber = (req, res) => {
         return res.status(400).json({error: {orderNumber: 'is missing'}})
     }
     const orderIDStart = toID(req.body.orderNumber)
-    console.log(orderIDStart)
 
     return db.collection('orders')
         .where(admin.firestore.FieldPath.documentId(), '>=', orderIDStart)
