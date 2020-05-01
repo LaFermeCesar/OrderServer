@@ -149,7 +149,7 @@ exports.promiseValidateOrder = (order) => {
             } else {
                 const locDate = new SwissDate(order.locationDate)
                 if (!loc.daysOfWeek.includes(locDate.day)
-                    || locDate.dayDifference(SwissDate.now()) < 1) {
+                    || locDate.dayDifference(SwissDate.now()) < 1 - !loc.isMarket) {
                     errors.locationDate = 'is invalid';
                 }
             }
