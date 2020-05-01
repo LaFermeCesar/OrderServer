@@ -146,7 +146,7 @@ exports.getOrdersSheet = (req, res) => {
                         return loc.name === order.location.name && dayDif >= -1 && dayDif <= 0;
                     })
                     .map(order => {
-                        const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber})`;
+                        const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.replace(' ', '.')})`;
                         const orderNumber = toNumber(order.orderID)
                         const breads = order.breadList
                             .map(breadOrder => `${breadOrder.quantity} ${breadOrder.name}`)
