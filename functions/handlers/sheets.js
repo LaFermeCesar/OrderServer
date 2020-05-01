@@ -6,6 +6,7 @@ const {dataToOrders} = require("./orders");
 const {dbGetUsers} = require("./users");
 const {dbGetLocations} = require("./locations");
 const {dbGetBreads} = require("./breads");
+const {toNumber} = require('../util/id_number');
 
 exports.dbGetOrders = () => {
     let orders, locations, breads;
@@ -146,13 +147,14 @@ exports.getOrdersSheet = (req, res) => {
                     })
                     .map(order => {
                         const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber})`;
+                        const orderNumber = toNumber(order.orderID)
                         const breads = order.breadList
                             .map(breadOrder => `${breadOrder.quantity} ${breadOrder.name}`)
                             .join(', ');
                         const dateTime = new Date(order.lastModified)
                         dateTime.setTime(dateTime.getTime() + 2 * 1000 * 60 * 60)
                         const dateTimeString = dayjs(dateTime).format('DD/MM HH:MM');
-                        return [name, dateTimeString, breads]
+                        return [name, dateTimeString, orderNumber, breads]
                     })
                     .sort((a, b) => {
                         if (a[0] >= b[0]) {
