@@ -12,10 +12,15 @@ const {staticValidateOrder} = require("../util/validaters");
 const {isAdmin} = require('../util/firebase_auth')
 
 exports.dataToOrders = (data) => {
-    return data.map((doc) => ({
-        orderID: doc.id,
-        ...doc.data()
-    }));
+    const orders = [];
+    data.forEach((doc) => {
+        const order = {
+            orderID: doc.id,
+            ...doc.data()
+        };
+        orders.push(order);
+    });
+    return orders
 };
 
 exports.getOrderFromNumber = (req, res) => {
