@@ -14,6 +14,7 @@ app.use(cors());
 // ROUTE ORDERS
 app.get('/future_orders', FBAuth, getFutureOrders);
 app.get('/past_orders', FBAuth, getPastOrders);
+app.get('/orders', FBAuth, getOrders);
 app.get('/list_orders', AdminAuth, getAllOrders);
 
 app.post('/order_number', AdminAuth, getOrderFromNumber)

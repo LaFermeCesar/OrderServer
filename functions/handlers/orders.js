@@ -12,15 +12,10 @@ const {staticValidateOrder} = require("../util/validaters");
 const {isAdmin} = require('../util/firebase_auth')
 
 exports.dataToOrders = (data) => {
-    const orders = [];
-    data.forEach((doc) => {
-        const order = {
-            orderID: doc.id,
-            ...doc.data()
-        };
-        orders.push(order);
-    });
-    return orders
+    return data.map((doc) => ({
+        orderID: doc.id,
+        ...doc.data()
+    }));
 };
 
 exports.getOrderFromNumber = (req, res) => {
@@ -47,9 +42,35 @@ exports.getOrderFromNumber = (req, res) => {
         });
 }
 
+exports.getOrders = (req, res) => {
+    let future, past, reccurent;
+
+    return db.collection('orders')
+        .where('userID', '==', req.user.uid)
+        .orderBy('locationDate', 'asc')
+        .get()
+        .then((data) => {
+            const future = [], past = [], recurrent = [];
+            exports.dataToOrders(data).forEach(order => {
+                if (order.isRecurrent) {
+                    recurrent.push(order);
+                } else if (order.locationDate >= SwissDate.now().string) {
+                    future.push(order);
+                } else {
+                    past.push(order)
+                }
+            })
+            return res.json({future, past, recurrent})
+        })
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json({error: 'something went wrong'});
+        });
+
+}
+
 exports.getFutureOrders = (req, res) => {
     return db.collection('orders')
-        // .orderBy('locationDate', 'desc') // get up
         .where('userID', '==', req.user.uid)
         .where('locationDate', '>=', SwissDate.now().string)
         .orderBy('locationDate', 'asc')
@@ -66,11 +87,9 @@ exports.getFutureOrders = (req, res) => {
 
 exports.getPastOrders = (req, res) => {
     return db.collection('orders')
-        // .orderBy('locationDate', 'desc') // get up
         .where('userID', '==', req.user.uid)
         .where('locationDate', '<', SwissDate.now().string)
         .orderBy('locationDate', 'desc')
-        // .limit(1)
         .get()
         .then((data) => {
             return res.json(exports.dataToOrders(data));

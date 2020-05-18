@@ -64,7 +64,7 @@ exports.dbGetOrders = () => {
 
 const makeBook = () => XLSX.utils.book_new();
 const addSheet = (book, data, name, date) => {
-    const dateString = dayjs(date.string).format('DD/MM/YYYY HH:MM')
+    const dateString = dayjs(date.string).format('DD/MM/YYYY')
     data.unshift([name, dateString]);
     XLSX.utils.book_append_sheet(book, XLSX.utils.aoa_to_sheet(data), name);
 }
@@ -146,14 +146,14 @@ exports.getOrdersSheet = (req, res) => {
                         return loc.name === order.location.name && dayDif >= -1 && dayDif <= 0;
                     })
                     .map(order => {
-                        const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.replace(' ', '.')})`;
+                        const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.split(' ').join('.')})`;
                         const orderNumber = toNumber(order.orderID)
                         const breads = order.breadList
                             .map(breadOrder => `${breadOrder.quantity} ${breadOrder.name}`)
                             .join(', ');
                         const dateTime = new Date(order.lastModified)
                         dateTime.setTime(dateTime.getTime() + 2 * 1000 * 60 * 60)
-                        const dateTimeString = dayjs(dateTime).format('DD/MM HH:MM');
+                        const dateTimeString = dayjs(dateTime).format('DD/MM HH:mm');
                         return [name, dateTimeString, orderNumber, breads]
                     })
                     .sort((a, b) => {
