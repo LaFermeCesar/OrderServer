@@ -233,7 +233,7 @@ exports.deleteOrder = (req, res) => {
                 return db.doc(`/orders/${orderID}`)
                     .delete()
                     .then(() => {
-                        console.log(`user ${req.user.uid} deleted a document at ${new Date().toISOString()}`)
+                        console.log(`user ${req.user.uid} deleted document ${orderID} at ${new Date().toISOString()}`)
                         return res.json({message: `document ${orderID} deleted successfully`})
                     })
             } else {
