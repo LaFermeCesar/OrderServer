@@ -65,7 +65,7 @@ exports.staticValidateUser = (phoneNumber, lastName, firstName) => {
     }
 };
 
-exports.staticValidateOrder = (userID, locationID, locationDate, breadList) => {
+exports.staticValidateOrder = (userID, locationID, locationDate, breadList, isRecurrent) => {
 
     const errors = {};
 
@@ -115,7 +115,6 @@ exports.staticValidateOrder = (userID, locationID, locationDate, breadList) => {
         errors.breadList = 'is missing';
     }
 
-
     if (Object.keys(errors).length > 0) {
         return {errors}
     }
@@ -127,6 +126,7 @@ exports.staticValidateOrder = (userID, locationID, locationDate, breadList) => {
             userID: userID,
             locationID: locationID,
             locationDate: locationDate.toISOString(),
+            isRecurrent: isRecurrent === true,
             breadList: breadList.map(breadOrder => ({
                 breadID: breadOrder.breadID,
                 quantity: parseFloat(breadOrder.quantity)

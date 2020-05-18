@@ -64,11 +64,11 @@ exports.signup = (req, res) => {
                         return res.json({token, locations, breads, user});
                     })
                     .catch((err) => {
-                        console.error(err);
                         // this should never be accessed as the doc.exists() above check this already
                         if (err.code === 'auth/email-already-in-use') {
-                            return res.status(400).json({phoneNumber: 'already in use'})
+                            return res.status(400).json({phoneNumber: 'already in use'});
                         } else {
+                            console.error(err);
                             return res.status(500).json({general: 'something went wrong, please try again'});
                         }
                     });
@@ -107,8 +107,12 @@ exports.login = (req, res) => {
             return res.json({token, locations, breads, user});
         })
         .catch((err) => {
-            console.log(err)
-            return res.status(403).json({general: 'Ce numéro est déjà associé à une autre paire de prénom/nom'})
+            if (err.code === 'auth/wrong-password') {
+                return res.status(403).json({general: 'Ce numéro est déjà associé à une autre paire de prénom/nom'});
+            } else {
+                console.log(err);
+                return res.status(500).json({general: 'something went wrong, please try again'});
+            }
         })
 
 };

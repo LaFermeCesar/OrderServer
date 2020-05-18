@@ -13,7 +13,7 @@ const {isAdmin} = require('../util/firebase_auth')
 
 exports.dataToOrders = (data) => {
     const orders = [];
-    data.forEach((doc) => {
+    data.forEach((doc) => { // data.map is not a function -> forEach
         const order = {
             orderID: doc.id,
             ...doc.data()
@@ -57,7 +57,7 @@ exports.getOrders = (req, res) => {
         .then((data) => {
             const future = [], past = [], recurrent = [];
             exports.dataToOrders(data).forEach(order => {
-                if (order.isRecurrent) {
+                if (order.isRecurrent === true) {
                     recurrent.push(order);
                 } else if (order.locationDate >= SwissDate.now().string) {
                     future.push(order);
@@ -148,6 +148,7 @@ exports.postOrder = (req, res) => {
         req.body.locationID,
         req.body.locationDate,
         req.body.breadList,
+        req.body.isRecurrent,
     );
 
     if (errors) {
