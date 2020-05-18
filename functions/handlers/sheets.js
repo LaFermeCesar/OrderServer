@@ -89,7 +89,7 @@ exports.getQuantitySheet = (req, res) => {
                 orders
                     .filter(order => {
                         const dayDif = new SwissDate(order.location.date).dayDifference(marketDate);
-                        return loc.name === order.location.name && dayDif >= -1 && dayDif <= 0;
+                        return order.isRecurrent || (loc.name === order.location.name && dayDif >= -1 && dayDif <= 0);
                     })
                     .forEach(order => {
                         order.breadList.forEach(breadOrder => {
@@ -143,7 +143,7 @@ exports.getOrdersSheet = (req, res) => {
                 const data = orders
                     .filter(order => {
                         const dayDif = new SwissDate(order.location.date).dayDifference(marketDate);
-                        return loc.name === order.location.name && dayDif >= -1 && dayDif <= 0;
+                        return order.isRecurrent || (loc.name === order.location.name && dayDif >= -1 && dayDif <= 0);
                     })
                     .map(order => {
                         const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.split(' ').join('.')})`;
