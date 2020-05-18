@@ -229,7 +229,7 @@ exports.deleteOrder = (req, res) => {
     return db.doc(`/orders/${orderID}`)
         .get()
         .then((data) => {
-            if (data.exists && data.data().userID === req.user.uid) {
+            if (data.exists && (isAdmin(req) || data.data().userID === req.user.uid)) {
                 return db.doc(`/orders/${orderID}`)
                     .delete()
                     .then(() => {
