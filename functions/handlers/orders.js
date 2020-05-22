@@ -74,37 +74,6 @@ exports.getOrders = (req, res) => {
 
 }
 
-exports.getFutureOrders = (req, res) => {
-    return db.collection('orders')
-        .where('userID', '==', req.user.uid)
-        .where('locationDate', '>=', SwissDate.now().string)
-        .orderBy('locationDate', 'asc')
-        .get()
-        .then((data) => {
-            return res.json(exports.dataToOrders(data))
-        })
-        .catch((err) => {
-            console.error(err);
-            return res.status(500).json({error: 'something went wrong'});
-        });
-};
-
-
-exports.getPastOrders = (req, res) => {
-    return db.collection('orders')
-        .where('userID', '==', req.user.uid)
-        .where('locationDate', '<', SwissDate.now().string)
-        .orderBy('locationDate', 'desc')
-        .get()
-        .then((data) => {
-            return res.json(exports.dataToOrders(data));
-        })
-        .catch((err) => {
-            console.error(err);
-            return res.status(500).json({error: 'something went wrong'});
-        });
-};
-
 const addOrder = (order, res) => {
     return db.collection('orders')
         .add(order)

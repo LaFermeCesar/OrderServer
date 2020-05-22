@@ -4,7 +4,7 @@ const app = require('express')();
 
 const {FBAuth, AdminAuth} = require("./util/firebase_auth");
 const {login, signup} = require('./handlers/users');
-const {getFutureOrders, getPastOrders, getOrders, postOrder, getAllOrders, deleteOrder, getOrderFromNumber} = require("./handlers/orders");
+const {getOrders, postOrder, getAllOrders, deleteOrder, getOrderFromNumber} = require("./handlers/orders");
 const {getLocations} = require("./handlers/locations");
 const {getBreads} = require("./handlers/breads");
 const {getOrdersSheet, getQuantitySheet} = require("./handlers/sheets");
@@ -13,8 +13,6 @@ const cors = require('cors');
 app.use(cors());
 
 // ROUTE ORDERS
-app.get('/future_orders', FBAuth, getFutureOrders);
-app.get('/past_orders', FBAuth, getPastOrders);
 app.get('/orders', FBAuth, getOrders);
 app.get('/list_orders', AdminAuth, getAllOrders);
 
