@@ -43,4 +43,8 @@ exports.AdminAuth = (req, res, next) => {
                 return res.status(403).json({error: 'user is not an admin'});
             }
         })
+        .catch((err) => {
+            console.error(err);
+            return res.status(403).json(err);
+        });
 };
