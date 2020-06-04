@@ -48,8 +48,6 @@ exports.getOrderFromNumber = (req, res) => {
 }
 
 exports.getOrders = (req, res) => {
-    let future, past, reccurent;
-
     return db.collection('orders')
         .where('userID', '==', req.user.uid)
         .orderBy('locationDate', 'asc')
@@ -71,7 +69,6 @@ exports.getOrders = (req, res) => {
             console.error(err);
             return res.status(500).json({error: 'something went wrong'});
         });
-
 }
 
 const addOrder = (order, res) => {
