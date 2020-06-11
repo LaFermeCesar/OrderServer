@@ -41,7 +41,7 @@ exports.dbGetOrders = () => {
                 isRecurrent: order.isRecurrent,
                 location: {
                     date: order.locationDate,
-                    name: order.location.name,
+                    name: (order.location || {name: 'unknown'}).name,
                 },
                 user: {
                     phoneNumber: order.user.phoneNumber,
@@ -49,9 +49,9 @@ exports.dbGetOrders = () => {
                     lastName: order.user.lastName,
                 },
                 breadList: order.breadList.map(breadOrder => ({
-                    name: breadOrder.bread.name,
+                    name: (breadOrder.bread || {name: 'unknown'}).name,
                     quantity: breadOrder.quantity,
-                    withDetail: breadOrder.bread.cat === 'levure',
+                    withDetail: (breadOrder.bread || {cat: 'unknown'}).cat === 'levure',
                 })),
                 lastModified: order.lastModified,
             }));
