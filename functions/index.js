@@ -3,7 +3,7 @@ const functions = require('firebase-functions');
 const app = require('express')();
 
 const {FBAuth, AdminAuth} = require("./util/firebase_auth");
-const {login, signup} = require('./handlers/users');
+const {login, signup, getUsers} = require('./handlers/users');
 const {getOrders, postOrder, getAllOrders, deleteOrder, getOrderFromNumber} = require("./handlers/orders");
 const {getLocations} = require("./handlers/locations");
 const {getBreads} = require("./handlers/breads");
@@ -27,6 +27,8 @@ app.get('/breads', getBreads);
 app.get('/locations', getLocations);
 
 // ROUTE USERS
+app.get('/export_users', AdminAuth, getUsers);
+
 app.post('/signup', signup);
 app.post('/login', login);
 

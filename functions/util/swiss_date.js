@@ -56,7 +56,7 @@ _defineProperty(SwissDate, "next", days => {
 });
 
 _defineProperty(SwissDate, "fixTzDay", date => {
-    // add two hours because of GMT+2 (in switzerland, at the time of the writing)
+    // add one/two hours because of GMT+1/2 (in switzerland, 1 hour, at the time of the writing)
     date = new Date(date);
     date.setTime(date.getTime() + 2 * HOUR);
     return date;

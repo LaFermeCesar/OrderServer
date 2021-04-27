@@ -26,6 +26,15 @@ exports.dbGetUsers = () => {
         });
 };
 
+exports.getUsers = (req, res) => {
+    return exports.dbGetUsers()
+        .then((users) => res.json(users))
+        .catch((err) => {
+            console.error(err);
+            return res.status(500).json({error: 'something went wrong'});
+        });
+};
+
 
 exports.signup = (req, res) => {
     const {errors, user: newUser} = staticValidateUser(req.body.phoneNumber, req.body.lastName, req.body.firstName);

@@ -12,6 +12,7 @@ const isString = (str) => typeof str === 'string' || str instanceof String;
 const isEmptyString = (str) => isString(str) && str.trim() === '';
 
 const normalizeString = (str) => {
+    // there may be an error here because of replace removing only the first hyphen
     return str.trim()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remove accents
         .replace('-', ' ') // hyphen to whitespace
