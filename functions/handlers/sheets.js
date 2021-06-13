@@ -149,17 +149,17 @@ exports.getOrdersSheet = (req, res) => {
                 const data = orders
                     .filter(order => isOrderForMarketDate(order, loc, marketDate))
                     .map(order => {
-                        const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.split(' ').join('.')})`;
+                        let name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.split(' ').join('.')})`;
+                        if (order.isRecurrent) {
+                            name = "[R] " + name;
+                        }
                         const orderNumber = toNumber(order.orderID)
                         const breads = order.breadList
                             .map(breadOrder => `${breadOrder.quantity} ${breadOrder.name}`)
                             .join(', ');
                         const dateTime = new Date(order.lastModified)
                         dateTime.setTime(dateTime.getTime() + 2 * 1000 * 60 * 60)
-                        let dateTimeString = dayjs(dateTime).format('DD/MM/YYYY HH:mm');
-                        if (order.isRecurrent) {
-                            dateTimeString = "[R] " + dateTimeString
-                        }
+                        const dateTimeString = dayjs(dateTime).format('DD/MM/YYYY HH:mm');
                         return [name, dateTimeString, orderNumber, breads]
                     })
                     .sort((a, b) => {
