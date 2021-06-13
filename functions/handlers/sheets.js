@@ -156,7 +156,10 @@ exports.getOrdersSheet = (req, res) => {
                             .join(', ');
                         const dateTime = new Date(order.lastModified)
                         dateTime.setTime(dateTime.getTime() + 2 * 1000 * 60 * 60)
-                        const dateTimeString = dayjs(dateTime).format('DD/MM/YYYY HH:mm');
+                        let dateTimeString = dayjs(dateTime).format('DD/MM/YYYY HH:mm');
+                        if (order.isRecurrent) {
+                            dateTimeString = "[R] " + dateTimeString
+                        }
                         return [name, dateTimeString, orderNumber, breads]
                     })
                     .sort((a, b) => {
