@@ -172,7 +172,7 @@ exports.promiseValidateOrder = (order) => {
                     if (bread.availableAt) {
                         const orderDate = new SwissDate(order.locationDate)
                         const availableDays = bread.availableAt[order.locationID]
-                        if (!availableDays.includes(orderDate.day)) {
+                        if (!availableDays || !availableDays.includes(orderDate.day)) {
                             errors[`breadList_breadID_${index}`] = 'is invalid';
                         }
                     }
