@@ -169,6 +169,13 @@ exports.promiseValidateOrder = (order) => {
                     if (q % step !== 0) {
                         errors[`breadList_quantity_${index}`] = 'is invalid';
                     }
+                    if (bread.availableAt) {
+                        const orderDate = new SwissDate(order.locationDate)
+                        const availableDays = bread.availableAt[order.locationID]
+                        if (!availableDays.includes(orderDate.day)) {
+                            errors[`breadList_breadID_${index}`] = 'is invalid';
+                        }
+                    }
                 }
             });
 
