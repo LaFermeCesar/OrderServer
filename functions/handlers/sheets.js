@@ -73,10 +73,10 @@ const bookToBuffer = (book) => XLSX.write(book, {type: 'buffer', bookType: 'xlsx
 
 const nextMarketDate = () => SwissDate.next([3, 6]);
 
-const isOrderForMarketDate = (order, marketDate) => {
+const isOrderForMarketDate = (order, marketLocation, marketDate) => {
     const locDate = new SwissDate(order.location.date);
     const dayDif = locDate.dayDifference(marketDate);
-    return (loc.name === order.location.name) && (
+    return (marketLocation.name === order.location.name) && (
         (order.isRecurrent && locDate.day === marketDate.day) ||
         (dayDif >= -1 && dayDif <= 0)
     );
@@ -96,7 +96,7 @@ exports.getQuantitySheet = (req, res) => {
                 const quantities = {};
 
                 orders
-                    .filter(order => isOrderForMarketDate(order, marketDate))
+                    .filter(order => isOrderForMarketDate(order, loc, marketDate))
                     .forEach(order => {
                         order.breadList.forEach(breadOrder => {
                             let name = breadOrder.name;
@@ -147,7 +147,7 @@ exports.getOrdersSheet = (req, res) => {
                 const sheetName = loc.name;
 
                 const data = orders
-                    .filter(order => isOrderForMarketDate(order, marketDate))
+                    .filter(order => isOrderForMarketDate(order, loc, marketDate))
                     .map(order => {
                         const name = `${order.user.lastName} ${order.user.firstName} (${order.user.phoneNumber.split(' ').join('.')})`;
                         const orderNumber = toNumber(order.orderID)
